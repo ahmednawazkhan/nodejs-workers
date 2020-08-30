@@ -22,4 +22,75 @@ async function randomUpdateLastActivity(usersCollection) {
     }
 };
 
-module.exports = {randomUpdateLastActivity}
+async function getUserCategories(usersCollection) {
+
+    /**
+    *
+    * Here a recommended approach is to stream data to redis instead of loading it to memory
+    * 
+    ***/
+
+    const categories = await usersCollection.aggregate([
+        
+        {
+            $addFields: {
+                computedMinutesSinceNow: {
+                    $mod: [
+                        {
+                            $divide: [
+                                { $subtract: [new Date(), '$meta.lastActivity'] },
+                                60 * 1000
+                            ]
+                        },
+                        5
+                    ]
+                }
+            }
+        },
+        {
+            $addFields: {
+                grouper: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: {
+                                    $and: [
+                                        { $gte: ['$computedMinutesSinceNow', 1] },
+                                        { $lte: ['$computedMinutesSinceNow', 2] }
+                                    ]
+                                },
+                                then: 'A'
+                            },
+                            {
+                                case: {
+                                    $and: [
+                                        { $gt: ['$computedMinutesSinceNow', 2] },
+                                        { $lte: ['$computedMinutesSinceNow', 3] }
+                                    ]
+                                },
+                                then: 'B'
+                            },
+                            {
+                                case: {
+                                    $and: [
+                                        { $gte: ['$computedMinutesSinceNow', 4] },
+                                        { $lte: ['$computedMinutesSinceNow', 5] }
+                                    ]
+                                },
+                                then: 'C'
+                            }
+                        ],
+                        default: 'D'
+                    }
+                }
+            }
+        },
+        {
+            $group: { _id: '$grouper', count: { $sum: 1 } }
+        }
+    ]).toArray()
+
+    return categories;
+}
+
+module.exports = {randomUpdateLastActivity, getUserCategories}
