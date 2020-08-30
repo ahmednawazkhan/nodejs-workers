@@ -1,14 +1,16 @@
-const { createUsersConnection } = require("./db/db");
-const { randomUpdateLastActivity, getUserCategories } = require("./workers");
+const { createUsersConnection } = require('./db/db');
+const { randomUpdateLastActivity, getUserCategories } = require('./workers');
+const config = require('config');
+const { createScheduler, startScheduler } = require('./scheduler');
 
 async function main() {
-    const usersCollection = await createUsersConnection()
+  const usersCollection = await createUsersConnection();
+  await randomUpdateLastActivity(usersCollection);
 
-    await randomUpdateLastActivity(usersCollection)
+  const scheduler = await createScheduler(usersCollection);
 
-    const u = await getUserCategories(usersCollection)
+  await startScheduler(scheduler)
 
-    console.log(u)
 }
 
 main().catch(err => {
