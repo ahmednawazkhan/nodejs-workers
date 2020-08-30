@@ -3,7 +3,7 @@
 First of all enjoyed this task a lot. It was really interesting and fun to code. 
 
 ### How to run code 
-1. Load data into db 
+1. Load data into db. You can update the db credentials in the script `backup/restore.sh` and run it.
 
 1. configure credentials in `config/local.yml` copied from `config/default.yml`
 1. `npm i`
@@ -25,4 +25,4 @@ On the UI you will see the output of the job, time taken by single job to run, a
 I heavily relied on mongo aggregation and restrained from loading the documents into the memory and compute the results there as the job runs every minute and if the data is increased to 500K, that approach will have performance issues
 ### Improvements 
 
-I think instead of loading the user categories into the memory, it should be streamed to redis but since it is a simple demo task, I added the comments there and loaded them in memory for display purposes. 
+I think instead of loading the user categories into the memory, it should be streamed to redis but since it is a simple demo task, I added the comments there and loaded them in memory for display purposes. Also for displaying purposes I query for the whole documents at the end of aggregation pipeline using `$$ROOT`. I think it can also be replaced with `emails` along with respective notifications to send.
