@@ -1,7 +1,10 @@
 const { createUsersConnection } = require("./db/db");
+const { randomUpdateLastActivity } = require("./workers");
 
 async function main() {
-    console.log(await createUsersConnection())
+    const usersCollection = await createUsersConnection()
+
+    await randomUpdateLastActivity(usersCollection)
 }
 
 main().catch(err => {
