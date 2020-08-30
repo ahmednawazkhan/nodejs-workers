@@ -31,7 +31,14 @@ async function getUserCategories(usersCollection) {
     ***/
 
     const categories = await usersCollection.aggregate([
-        
+        {
+            $match: {
+                "meta.lastActivity": {
+                    $exists: true,
+                    $ne: null
+                }
+            }
+        },
         {
             $addFields: {
                 computedMinutesSinceNow: {
@@ -86,11 +93,18 @@ async function getUserCategories(usersCollection) {
             }
         },
         {
-            $group: { _id: '$grouper', count: { $sum: 1 } }
+            $match: { grouper: { $ne: 'D' } }
+        },
+        {
+            $group: { _id: '$grouper', users: { $addToSet: '$$ROOT' } }
         }
     ]).toArray()
 
-    return categories;
+    return {
+        usersWithOneToTwoMinutesActivity: categories.find(c => c._id === 'A').users,
+        usersCountForTwoToThreeMinutesActivity: categories.find(c => c._id === 'B').users.length,
+        usersCountForFourToFiveMinutesActivity: categories.find(c => c._id === 'C').users.length
+    }
 }
 
-module.exports = {randomUpdateLastActivity, getUserCategories}
+module.exports = { randomUpdateLastActivity, getUserCategories };
