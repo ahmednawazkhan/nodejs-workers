@@ -4,7 +4,8 @@
   "description": "Inside the repo you can find a backup folder. The folder has users dump. The `lastActivity` field contains the timestamp \r of the users last activity. Use this time to check for how long the user has been inactive.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:docker:prod": "wait-port $MONGO_HOST:$MONGO_PORT && node index.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "config": "^3.3.1",
     "express": "^4.17.1",
     "js-yaml": "^3.14.0",
-    "mongodb": "^3.6.0"
+    "mongodb": "^3.6.0",
+    "wait-port": "^0.2.9"
   }
 }

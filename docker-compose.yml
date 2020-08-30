@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  task-mongo:
+    image: mongo
+    restart: always
+    container_name: task-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: task
+    volumes:
+      - ./backup/:/docker-entrypoint-initdb.d/
+
+  task-node:
+    build: .
+    container_name: task-node
+    depends_on: 
+      - task-mongo
+    environment: 
+      - MONGO_HOST=task-mongo
+      - MONGO_PORT=27017
+      - MONGO_USER=root
+      - MONGO_PASSWORD=root 
+      - MONGO_DATABASE=task
+    ports: 
+      - 3000:3000
